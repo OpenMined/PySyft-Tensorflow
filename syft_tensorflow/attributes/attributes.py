@@ -32,11 +32,10 @@ class TensorFlowAttributes(FrameworkAttributes):
     ALIAS = "tensorflow"
     Tensor = TensorFlowTensor
 
-    def __init__(self, tensorflow: ModuleType, hook: "TensorFlowHook"):
+    def __init__(self, tensorflow: ModuleType, hook: ModuleType):
+        super().__init__(tensorflow, hook)
         # Stash the hook here for global access elsewhere
         self.hook = hook
-
-        # SECTION: List all functions in tf module that we want to overload
 
         # List modules that we will hook
         self.tensorflow_modules = {
@@ -107,8 +106,15 @@ class TensorFlowAttributes(FrameworkAttributes):
 
         self.command_guard = self._command_guard
 
-        # Dict {method_name: <is_inplace:bool>
+        self.exclude = [
+            '__getattr__',
+            '__finalize__',
+            '_constructor',
+            '_init_mgr',
+        ]
+
         self.inplace_methods = {}
+
 
     def is_inplace_method(self, method):
         # I've not yet encountered any inplace methods in TF

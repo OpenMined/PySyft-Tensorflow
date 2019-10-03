@@ -21,13 +21,15 @@ class TensorFlowHook(FrameworkHook):
         local_worker: BaseWorker = None,
         is_client: bool = True
     ):
-        self.tensorflow = tensorflow
-        self.tensorflow.hook = self
+
+        self.tensorflow = tf
         self.framework = self.tensorflow
 
-        syft.tensorflow = TensorFlowAttributes(tensorflow, self)
+        syft.tensorflow = TensorFlowAttributes(tf, self)
+
         syft.framework = syft.tensorflow
         syft.tensorflow.hook = self
+        syft.hook = self
 
         self.local_worker = local_worker
 
@@ -51,11 +53,16 @@ class TensorFlowHook(FrameworkHook):
         else:
             self.local_worker.hook = self
 
-        self.to_auto_overload = {}
+        self.to_auto_overload = {
+          Tensor: self._which_methods_should_we_auto_overload(
+              Tensor
+          )
+        }
 
         self.args_hook_for_overloaded_attr = {}
 
         self._hook_native_tensor(Tensor, TensorFlowTensor)
+        self._hook_pointer_tensor_methods(Tensor)
 
         self._hook_tensorflow_module()
 
@@ -82,23 +89,10 @@ class TensorFlowHook(FrameworkHook):
         # Overload Torch tensor properties with Syft properties
         self._hook_properties(tensor_type)
 
-        # Returns a list of methods to be overloaded,
-        # stored in the dict to_auto_overload
-        # with tensor_type as a key
-        # self.to_auto_overload[tensor_type] =
-        # self._which_methods_should_we_auto_overload(
-        #     tensor_type
-        # )
-
-        # [We don't rename native methods as torch tensors are not hooked]
-        #  Rename native functions
-        # self._rename_native_functions(tensor_type)
-
         # Overload auto overloaded with Torch methods
         self._add_methods_from_native_tensor(tensor_type, syft_type)
 
-        # TODO Need to add 'get_hooked_method'
-        # self._hook_native_methods(tensor_type)
+        self._hook_native_methods(tensor_type)
 
     def _hook_tensorflow_module(self):
         tensorflow_modules = syft.tensorflow.tensorflow_modules
