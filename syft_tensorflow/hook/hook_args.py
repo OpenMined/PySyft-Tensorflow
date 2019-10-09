@@ -7,6 +7,7 @@ import tensorflow as tf
 
 from tensorflow.python.framework.ops import EagerTensor
 from syft.exceptions import PureFrameworkTensorFoundError
+from tensorflow.python.ops.resource_variable_ops import ResourceVariable
 from syft.generic.frameworks.hook.hook_args import (
     register_ambiguous_method,
     register_backward_func,
@@ -23,6 +24,7 @@ type_rule = {
     tf.Variable: one,
     TensorFlowTensor: one,
     EagerTensor: one,
+    ResourceVariable: one,
 }
 
 def default_forward(i):
@@ -34,11 +36,13 @@ def default_forward(i):
 forward_func = {
     tf.Tensor: default_forward,
     tf.Variable: default_forward,
+    ResourceVariable: default_forward,
     EagerTensor: default_forward,
 }
 backward_func = {
     tf.Tensor: lambda i: i.wrap(),
     tf.Variable: lambda i: i.wrap(),
+    ResourceVariable: lambda i: i.wrap(),
     TensorFlowTensor: lambda i: i.wrap(),
     EagerTensor: lambda i: i.wrap(),
 }
