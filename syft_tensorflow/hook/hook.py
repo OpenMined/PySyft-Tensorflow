@@ -284,7 +284,7 @@ class TensorFlowHook(FrameworkHook):
 
     @classmethod
     def create_wrapper(cls, child_to_wrap, *args, **kwargs):
-        if type(child_to_wrap.object_type)==type(tf.Variable):
+        if child_to_wrap.object_type==tf.Variable:
            return tf.Variable([])
         else:
            return tf.constant([])
