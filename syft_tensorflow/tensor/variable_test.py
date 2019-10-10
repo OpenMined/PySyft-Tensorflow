@@ -14,3 +14,8 @@ def test_add_variables(remote):
   z_ptr = x + y
   z = z_ptr.get()
   assert np.array_equal(z.numpy(), [5., 5.])
+
+def test_variable_repr(remote):
+  x = tf.Variable([1, 2, 3]).send(remote)
+  repr = str(x)
+  assert repr.startswith('(Wrapper)>[PointerTensor | me')

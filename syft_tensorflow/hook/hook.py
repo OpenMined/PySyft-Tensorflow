@@ -77,6 +77,10 @@ class TensorFlowHook(FrameworkHook):
         syft.local_worker = self.local_worker
         syft.hook = self
 
+        # This must happen last!
+        # See this functions documentation for more info.
+        self._add_methods_to_eager_tensor()
+
     def _hook_native_tensor(self, tensor_type: type, syft_type: type):
         """Adds PySyft Tensor Functionality to the given native tensor type.
          Overloads the given native Torch tensor to add PySyft Tensor
@@ -282,9 +286,35 @@ class TensorFlowHook(FrameworkHook):
                 # Add this method to the TF tensor
                 setattr(tensor_type, attr, getattr(syft_type, attr))
 
+    def _add_methods_to_eager_tensor(self):
+      """
+      Add required TensorFlowTensor methods to EagerTensor.
+
+      When a user creates a tensor, e.g. with `tf.constant([1,2,3])`, the
+      type of the returned object is an `EagerTensor`.  EagerTensor is defined
+      in tensorflow and is a super class of tf.Tensor.  However, EagerTensor is
+      not importable so we cannot add the properties to it that we want.
+      So we do that here, which requires us to instantiate an instance of an
+      EagerTensor to then get reference to the type.
+
+      We do it this way for 2 reasons:
+
+      1. Avoid monkeypatching functions per instance (e.g. having to overwrite the
+         function every time we make a tensor)
+      2. Most dunder methods are actually looked up on the class itself, rather
+         than the instance, so monkeypatching the instance doesn't even work for
+         things like __repr__.
+      """
+
+      dummy = tf.constant(0)
+      eager_type = type(dummy)
+
+      eager_type.__repr__ = TensorFlowTensor.__repr__
+      eager_type.__str__ = TensorFlowTensor.__str__
+
     @classmethod
     def create_wrapper(cls, child_to_wrap, *args, **kwargs):
-        if child_to_wrap.object_type==tf.Variable:
+        if child_to_wrap.object_type == tf.Variable:
            return tf.Variable([])
         else:
            return tf.constant([])

@@ -17,3 +17,8 @@ def test_add(remote):
   z = z_ptr.get()
 
   assert tf.math.equal(z, tf.constant(5.0))
+
+def test_constant_repr(remote):
+  x = tf.constant([1, 2, 3]).send(remote)
+  repr = str(x)
+  assert repr.startswith('(Wrapper)>[PointerTensor | me')
