@@ -162,7 +162,7 @@ class TensorFlowVariable(AbstractTensor):
                 self.child = ptr
                 return self
             else:
-                output = ptr if no_wrap else ptr.wrap()
+                output = ptr if no_wrap else ptr.wrap(type=tf.Variable, initial_value=[])
 
         else:
 
@@ -173,7 +173,7 @@ class TensorFlowVariable(AbstractTensor):
             output = syft.MultiPointerTensor(children=children)
 
             if not no_wrap:
-                output = output.wrap()
+                output = output.wrap(type=tf.Variable, initial_value=[])
 
         return output
 
@@ -232,9 +232,6 @@ class TensorFlowVariable(AbstractTensor):
         if shape is None:
             shape = self.shape
 
-        if object_type is None:
-            object_type = tf.Variable
-
         ptr = syft.PointerTensor.create_pointer(
             self,
             location,
@@ -244,7 +241,6 @@ class TensorFlowVariable(AbstractTensor):
             ptr_id,
             garbage_collect_data,
             shape,
-            object_type=object_type,
         )
 
         return ptr

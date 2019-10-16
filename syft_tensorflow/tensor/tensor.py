@@ -162,7 +162,7 @@ class TensorFlowTensor(AbstractTensor):
                 self.child = ptr
                 return self
             else:
-                output = ptr if no_wrap else ptr.wrap()
+                output = ptr if no_wrap else ptr.wrap(type=tf.constant, value=[])
 
         else:
 
@@ -173,7 +173,7 @@ class TensorFlowTensor(AbstractTensor):
             output = syft.MultiPointerTensor(children=children)
 
             if not no_wrap:
-                output = output.wrap()
+                output = output.wrap(type=tf.constant, value=[])
 
         return output
 
@@ -212,7 +212,6 @@ class TensorFlowTensor(AbstractTensor):
         ptr_id: (str or int) = None,
         garbage_collect_data: bool = True,
         shape=None,
-        object_type=None,
     ) -> PointerTensor:
         """Creates a pointer to the "self" torch.Tensor object.
 
@@ -232,9 +231,6 @@ class TensorFlowTensor(AbstractTensor):
         if shape is None:
             shape = self.shape
 
-        if object_type is None:
-            object_type = tf.Tensor
-
         ptr = syft.PointerTensor.create_pointer(
             self,
             location,
@@ -244,7 +240,6 @@ class TensorFlowTensor(AbstractTensor):
             ptr_id,
             garbage_collect_data,
             shape,
-            object_type=object_type,
         )
 
         return ptr

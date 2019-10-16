@@ -15,6 +15,8 @@ PySyft-TensorFlow is available on pip
 pip install syft-tensorflow
 ```
 
+NOTE: We aren't yet on a proper release schedule. Until then, we recommend building the code from source. The master branch is intended to be kept in line with [this branch](https://github.com/dropoutlabs/PySyft/tree/dev) on the [DropoutLabs](https://github.com/dropoutlabs/PySyft) fork of PySyft. If you have any trouble, please open an issue or reach out on Slack via the #team_tensorflow or #team_pysyft channels.
+
 ## Usage
 
 See the [PySyft tutorials](https://github.com/OpenMined/PySyft/tree/master/examples/tutorials)
