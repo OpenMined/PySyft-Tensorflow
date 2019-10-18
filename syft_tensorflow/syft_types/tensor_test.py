@@ -19,14 +19,20 @@ def test_constant_with_numpy(remote):
   assert tf.math.equal(x_to_give, x_gotten).numpy().all()
 
 def test_add(remote):
-  x = tf.constant(2.0).send(remote)
-  y = tf.constant(3.0).send(remote)
-  z_ptr = x + y
-  z = z_ptr.get()
+    x = tf.constant(2.0).send(remote)
+    y = tf.constant(3.0).send(remote)
+    z_ptr = x + y
+    z = z_ptr.get()
 
-  assert tf.math.equal(z, tf.constant(5.0))
+    assert tf.math.equal(z, tf.constant(5.0))
 
 def test_constant_repr(remote):
   x = tf.constant([1, 2, 3]).send(remote)
   repr = str(x)
   assert repr.startswith('(Wrapper)>[PointerTensor | me')
+
+def test_gotten_repr(remote):
+  x = tf.constant([1, 2, 3]).send(remote).get()
+  repr = str(x)
+
+  assert repr == "tf.Tensor([1 2 3], shape=(3,), dtype=int32)"

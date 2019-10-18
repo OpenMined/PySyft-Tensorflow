@@ -13,7 +13,7 @@ from syft.generic.frameworks.types import FrameworkTensor
 from syft.generic.frameworks.hook import hook_args
 
 
-class TensorFlowVariable(AbstractTensor):
+class TensorFlowTensor(AbstractTensor):
     """Add methods to this tensor to have them added to every tf.Tensor object.
 
     This tensor is simply a more convenient way to add custom functions to
@@ -134,7 +134,7 @@ class TensorFlowVariable(AbstractTensor):
             location = location[0]
 
             if hasattr(self, "child") and isinstance(
-              self.child, PointerTensor
+                self.child, PointerTensor
             ):
                 self.child.garbage_collect_data = False
 
@@ -162,7 +162,7 @@ class TensorFlowVariable(AbstractTensor):
                 self.child = ptr
                 return self
             else:
-                output = ptr if no_wrap else ptr.wrap(type=tf.Variable, initial_value=[])
+                output = ptr if no_wrap else ptr.wrap(type=tf.constant, value=[])
 
         else:
 
@@ -173,7 +173,7 @@ class TensorFlowVariable(AbstractTensor):
             output = syft.MultiPointerTensor(children=children)
 
             if not no_wrap:
-                output = output.wrap(type=tf.Variable, initial_value=[])
+                output = output.wrap(type=tf.constant, value=[])
 
         return output
 
@@ -212,7 +212,6 @@ class TensorFlowVariable(AbstractTensor):
         ptr_id: (str or int) = None,
         garbage_collect_data: bool = True,
         shape=None,
-        object_type: str = None,
     ) -> PointerTensor:
         """Creates a pointer to the "self" tf.Tensor object.
 

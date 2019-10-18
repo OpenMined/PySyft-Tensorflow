@@ -17,7 +17,7 @@ from syft.generic.frameworks.hook.hook_args import (
     one,
 )
 
-from syft_tensorflow.tensor import TensorFlowTensor
+from syft_tensorflow.syft_types import TensorFlowTensor
 
 
 type_rule = {
@@ -27,19 +27,26 @@ type_rule = {
     EagerTensor: one,
     ResourceVariable: one,
     np.ndarray: lambda x: 0,
+    tf.keras.layers.Layer: one,
+    tf.keras.models.Model:one,
 }
 
-def default_forward(i):
-  if hasattr(i, "child"):
-    return i.child
 
-  return (_ for _ in ()).throw(PureFrameworkTensorFoundError)
+def default_forward(i):
+    if hasattr(i, "child"):
+        return i.child
+
+    return (_ for _ in ()).throw(PureFrameworkTensorFoundError)
+
 
 forward_func = {
     tf.Tensor: default_forward,
     tf.Variable: default_forward,
     ResourceVariable: default_forward,
     EagerTensor: default_forward,
+    tf.keras.layers.Layer: default_forward,
+    tf.keras.models.Model: default_forward,
+
 }
 backward_func = {
     tf.Tensor: lambda i: i.wrap(),
@@ -47,6 +54,8 @@ backward_func = {
     ResourceVariable: lambda i: i.wrap(),
     TensorFlowTensor: lambda i: i.wrap(),
     EagerTensor: lambda i: i.wrap(),
+    tf.keras.layers.Layer: lambda i: i.wrap(),
+    tf.keras.models.Model: lambda i: i.wrap(),
 }
 ambiguous_methods = {"__getitem__", "__setitem__"}
 

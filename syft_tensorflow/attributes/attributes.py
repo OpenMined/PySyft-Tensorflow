@@ -4,7 +4,7 @@ import typing
 from tensorflow.python.framework.ops import EagerTensor
 from syft.generic.frameworks.attributes import FrameworkAttributes
 
-from syft_tensorflow.tensor import TensorFlowTensor
+from syft_tensorflow.syft_types import TensorFlowTensor
 
 if typing.TYPE_CHECKING:
     from syft_tensorflow.hook import TensorFlowHook
