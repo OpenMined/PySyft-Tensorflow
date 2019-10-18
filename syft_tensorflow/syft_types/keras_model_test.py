@@ -79,4 +79,21 @@ def test_keras_model_fit(remote):
     np.testing.assert_almost_equal(final_loss, 34.6580, decimal=4)
 
 
+def test_model_repr(remote):
+    model_to_give = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(5, input_shape=[2])
+    ])
+    model_to_give_repr = str(model_to_give)
+
+    model_gotten = model_to_give.send(remote).get()
+    model_gotten_repr = str(model_gotten)
+
+    assert model_to_give_repr.startswith(
+        '<tensorflow.python.keras.engine.sequential.Sequential'
+    )
+    assert model_gotten_repr.startswith(
+        '<tensorflow.python.keras.engine.sequential.Sequential'
+    )
+
+
 

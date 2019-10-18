@@ -208,6 +208,8 @@ class TensorFlowHook(FrameworkHook):
             "__setattr__",
             "__sizeof__",
             "__subclasshook__",
+            "__str__",
+            "__repr__",
         ]
         self._transfer_methods_to_framework_class(model_cls, from_cls, exclude)
 
