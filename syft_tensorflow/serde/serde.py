@@ -1,7 +1,8 @@
 from collections import OrderedDict
-import h5py
 import io
+import os
 from tempfile import TemporaryDirectory
+import zipfile
 
 import syft
 from syft.generic.object import initialize_object
@@ -221,8 +222,26 @@ def _simplify_keras_model(model: tf.keras.Model):
     """
     bio = io.BytesIO()
 
-    with h5py.File(bio) as file:
-        tf.keras.models.save_model(model, file, include_optimizer=True, overwrite=True)
+    with TemporaryDirectory() as model_location:
+        tf.keras.models.save_model(
+            model,
+            model_location,
+            overwrite=True,
+            include_optimizer=True,
+            save_format='tf',
+        )
+
+        with zipfile.ZipFile(bio, 'w', zipfile.ZIP_DEFLATED) as model_file:
+            # TODO: This process is way inefficient. Find a faster way to serde
+            #  SavedModels. See commit b55195a2d4b6852642f987a5a4105167120d123b
+            #  for an h5py implementation (which is less general, but clearly
+            #  more efficient)
+            for root, dir, files in os.walk(model_location):
+                relroot = os.path.relpath(root, start=model_location)
+                for file in files:
+                    filename = os.path.join(root, file)
+                    arcname = os.path.join(relroot, file)
+                    model_file.write(filename, arcname=arcname)
 
     model_ser = bio.getvalue()
 
@@ -236,7 +255,7 @@ def _detail_keras_model(worker, model_tuple):
 
     Args:
         modeltuple (bin): serialized obj of Keras model.
-        It's a tuple where the first value is the binary of the model. 
+        It's a tuple where the first value is the binary of the model.
         The second is the model id.
 
     Returns:
@@ -244,8 +263,14 @@ def _detail_keras_model(worker, model_tuple):
     """
     model_ser, model_id = model_tuple
     bio = io.BytesIO(model_ser)
-    with h5py.File(bio) as file:
-        model = tf.keras.models.load_model(file)
+    with TemporaryDirectory() as model_location:
+        with zipfile.ZipFile(bio, 'r', zipfile.ZIP_DEFLATED) as model_file:
+            # WARNING: zipped archives can potentially deposit extra files onto
+            #  the system, although Python's zipfile offers some protection
+            #  more info: https://docs.python.org/3/library/zipfile.html#zipfile.ZipFile.extractall
+            # TODO: further investigate security, find better option if needed
+            model_file.extractall(model_location)
+        model = tf.keras.models.load_model(model_location)
 
     initialize_object(
         hook=syft.tensorflow.hook,
