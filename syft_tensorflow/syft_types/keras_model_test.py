@@ -59,7 +59,7 @@ def test_keras_model_fit(remote):
     k_init = tf.keras.initializers.RandomNormal(seed=1)
 
     model_to_give = tf.keras.models.Sequential([
-                    tf.keras.layers.Dense(5, 
+                    tf.keras.layers.Dense(5,
                                           input_shape=[2],
                                           kernel_initializer=k_init)
     ])
@@ -67,7 +67,7 @@ def test_keras_model_fit(remote):
     model_to_give.compile(optimizer='adam',
                           loss='categorical_crossentropy',
                           metrics=['accuracy'])
-    
+
 
     model_ptr = model_to_give.send(remote)
     x_ptr = x_to_give.send(remote)
@@ -92,8 +92,5 @@ def test_model_repr(remote):
         '<tensorflow.python.keras.engine.sequential.Sequential'
     )
     assert model_gotten_repr.startswith(
-        '<tensorflow.python.keras.engine.sequential.Sequential'
+        '<tensorflow.python.keras.saving.saved_model.load.Sequential'
     )
-
-
-
