@@ -59,6 +59,7 @@ class TensorFlowHook(FrameworkHook):
             self.local_worker.hook = self
 
         self.to_auto_overload = {
+            tf.math: ["add"],
             Tensor: self._which_methods_should_we_auto_overload(
                 Tensor
             ),
@@ -91,6 +92,9 @@ class TensorFlowHook(FrameworkHook):
         self._hook_pointer_tensor_methods(Tensor)
         self._hook_pointer_tensor_methods(tf.Variable)
         self._hook_pointer_tensor_methods(ResourceVariable)
+
+        self._hook_pointer_tensor_methods(tf.math)
+        self._hook_multi_pointer_tensor_methods(tf.math)
 
         self._hook_object_pointer_methods(tf.keras.layers.Layer)
         self._hook_object_pointer_methods(tf.keras.models.Model)
@@ -125,7 +129,7 @@ class TensorFlowHook(FrameworkHook):
         self._hook_tensor_properties(tensor_type)
 
         # Overload auto overloaded with TensorFlow methods
-        exclude = [  # Overload auto overloaded with TensorFlow methods
+        exclude = [
             "__class__",
             "__delattr__",
             "__dir__",
@@ -355,6 +359,9 @@ class TensorFlowHook(FrameworkHook):
 
       eager_type.__repr__ = TensorFlowTensor.__repr__
       eager_type.__str__ = TensorFlowTensor.__str__
+
+      for method in self.to_auto_overload[tf.math]:
+          setattr(eager_type, method, getattr(tf, method))
 
     def _hook_keras_methods(self, keras_type: type):
         """
