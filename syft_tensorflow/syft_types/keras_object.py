@@ -4,7 +4,7 @@ import tensorflow as tf
 
 import syft
 from syft.generic.frameworks.hook import hook_args
-from syft.generic.object import AbstractObject
+from syft.generic.abstract.object import AbstractObject
 from syft.generic.pointers.object_pointer import ObjectPointer
 from syft.workers.base import BaseWorker
 

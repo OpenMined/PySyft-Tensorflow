@@ -5,8 +5,8 @@ from tempfile import TemporaryDirectory
 import zipfile
 
 import syft
-from syft.generic.object import initialize_object
-from syft.generic.tensor import initialize_tensor
+from syft.generic.abstract.object import initialize_object
+from syft.generic.abstract.tensor import initialize_tensor
 import tensorflow as tf
 from tensorflow.python.framework.ops import EagerTensor
 from tensorflow.python.ops.resource_variable_ops import ResourceVariable

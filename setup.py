@@ -17,7 +17,7 @@ requirements = read("requirements.txt").split()
 
 setup(
     name="syft-tensorflow",
-    version="0.1.0",
+    version="0.1.1",
     author="OpenMined",
     author_email="contact@openmined.org",
     description=("TensorFlow Bindings for PySyft"),

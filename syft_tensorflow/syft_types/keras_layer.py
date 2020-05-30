@@ -3,14 +3,8 @@ import weakref
 import tensorflow as tf
 
 import syft
-from syft.generic.frameworks.hook import hook_args
-from syft.generic.object import AbstractObject
-from syft.generic.pointers.object_pointer import ObjectPointer
-from syft.workers.base import BaseWorker
 
 from syft_tensorflow.syft_types import KerasObject
-
-from syft.exceptions import PureFrameworkTensorFoundError
 
 
 class KerasLayer(KerasObject):

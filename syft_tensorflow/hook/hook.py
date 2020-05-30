@@ -10,7 +10,7 @@ import syft
 from syft.workers.base import BaseWorker
 from syft.workers.virtual import VirtualWorker
 from syft.generic.frameworks.hook.hook import FrameworkHook
-from syft.generic.object import initialize_object
+from syft.generic.abstract.object import initialize_object
 
 from syft_tensorflow.attributes import TensorFlowAttributes
 from syft_tensorflow.syft_types import TensorFlowTensor
